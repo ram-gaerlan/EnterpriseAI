@@ -7,6 +7,7 @@ from app.config import get_settings
 from app.database import get_db
 from app.models.db_models import Document, DocumentChunk
 from app.models.schemas import DocumentUploadResponse
+from app.services.embeddings import generate_embeddings
 from app.services.document_processor import (
     DocumentProcessingError,
     chunk_text,
@@ -61,8 +62,17 @@ async def upload_document(
     db.add(document)
     await db.flush()  # assigns document.id without ending the transaction
 
-    for index, chunk_content in enumerate(chunks):
-        db.add(DocumentChunk(document_id=document.id, chunk_index=index, content=chunk_content))
+    embeddings = await generate_embeddings(chunks)
+
+    for index, (chunk_content, embedding) in enumerate(zip(chunks, embeddings)):
+        db.add(
+            DocumentChunk(
+                document_id=document.id,
+                chunk_index=index,
+                content=chunk_content,
+                embedding=embedding,
+            )
+        )
 
     await db.commit()
     await db.refresh(document)

@@ -10,7 +10,7 @@ from app.database import Base
 # text-embedding-3-small produces 1536-dimensional vectors.
 # Switching to text-embedding-3-large later means changing this to 3072
 # and re-embedding existing chunks — the dimension is fixed per column.
-EMBEDDING_DIMENSIONS = 1536
+EMBEDDING_DIMENSIONS = 768
 
 
 class Document(Base):

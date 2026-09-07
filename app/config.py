@@ -10,8 +10,8 @@ class Settings(BaseSettings):
 
     database_url: str
 
-    # Optional for now — becomes required once we start calling OpenAI in Step 4.
-    openai_api_key: str | None = None
+    # Was: gemini_api_key: str | None = None
+    gemini_api_key: str
 
     upload_max_size_mb: int = 10
     allowed_file_types: str = "pdf,txt"
