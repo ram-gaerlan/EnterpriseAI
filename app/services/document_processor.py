@@ -34,29 +34,55 @@ def clean_text(text: str) -> str:
     return text.strip()
 
 
-def chunk_text(text: str, chunk_size: int = 1000, chunk_overlap: int = 150) -> list[str]:
-    """Splits text into overlapping chunks, preferring paragraph boundaries
-    over cutting at an arbitrary character count."""
+def chunk_text(
+    text: str,
+    chunk_size: int = 1000,
+    chunk_overlap: int = 150
+) -> list[str]:
+    """Split text into overlapping chunks while preferring paragraph boundaries."""
+
+    if chunk_overlap >= chunk_size:
+        raise ValueError("chunk_overlap must be smaller than chunk_size")
+
     paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
 
     chunks: list[str] = []
     current = ""
 
     for paragraph in paragraphs:
+
+        # Handle paragraphs larger than chunk_size separately.
+        if len(paragraph) > chunk_size:
+            if current:
+                chunks.append(current)
+                current = ""
+
+            start = 0
+
+            while start < len(paragraph):
+                end = start + chunk_size
+                chunk = paragraph[start:end]
+                chunks.append(chunk)
+
+                if end >= len(paragraph):
+                    break
+
+                start = end - chunk_overlap
+
+            continue
+
+        # Try adding the paragraph to the current chunk.
         candidate = f"{current}\n\n{paragraph}" if current else paragraph
 
         if len(candidate) <= chunk_size:
             current = candidate
-            continue
-
-        if current:
-            chunks.append(current)
-            current = current[-chunk_overlap:] + "\n\n" + paragraph
         else:
-            # A single paragraph longer than chunk_size — hard-split it as a fallback
-            current = paragraph[:chunk_size]
-            chunks.append(current)
-            current = paragraph[chunk_size - chunk_overlap:]
+            # Save the current chunk.
+            if current:
+                chunks.append(current)
+
+            # Start a new chunk with the paragraph.
+            current = paragraph
 
     if current:
         chunks.append(current)

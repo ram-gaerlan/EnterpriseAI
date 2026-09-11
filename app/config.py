@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     database_url: str
+    test_database_url: str | None = None
 
     # Was: gemini_api_key: str | None = None
     gemini_api_key: str
