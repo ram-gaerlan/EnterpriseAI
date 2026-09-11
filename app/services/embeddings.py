@@ -29,3 +29,17 @@ async def generate_embeddings(texts: list[str]) -> list[list[float]]:
     )
 
     return [embedding.values for embedding in response.embeddings]
+
+async def generate_query_embedding(text: str) -> list[float]:
+    """Embeds a single question for retrieval — uses RETRIEVAL_QUERY, not
+    RETRIEVAL_DOCUMENT, since a question is phrased differently than the
+    document content it's meant to match against."""
+    response = await client.aio.models.embed_content(
+        model=EMBEDDING_MODEL,
+        contents=[text],
+        config=types.EmbedContentConfig(
+            output_dimensionality=OUTPUT_DIMENSIONS,
+            task_type="RETRIEVAL_QUERY",
+        ),
+    )
+    return response.embeddings[0].values
