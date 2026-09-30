@@ -17,10 +17,12 @@ class Settings(BaseSettings):
     upload_max_size_mb: int = 10
     allowed_file_types: str = "pdf,txt"
 
+    jwt_secret_key: str
+    jwt_expire_minutes: int = 60
+
     @property
     def allowed_extensions(self) -> list[str]:
         return [ext.strip().lower() for ext in self.allowed_file_types.split(",")]
-
 
 @lru_cache
 def get_settings() -> Settings:

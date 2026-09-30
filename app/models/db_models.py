@@ -12,6 +12,14 @@ from app.database import Base
 # and re-embedding existing chunks — the dimension is fixed per column.
 EMBEDDING_DIMENSIONS = 768
 
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(unique=True, index=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(nullable=False)
+    role: Mapped[str] = mapped_column(default="user", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
 class Document(Base):
     __tablename__ = "documents"
@@ -19,6 +27,7 @@ class Document(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     filename: Mapped[str] = mapped_column(nullable=False)
     file_type: Mapped[str] = mapped_column(nullable=False)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)  # NEW
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
     chunks: Mapped[list["DocumentChunk"]] = relationship(

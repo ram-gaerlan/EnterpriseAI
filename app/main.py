@@ -8,6 +8,8 @@ from app.routers import documents
 
 from app.routers import documents, questions
 
+from app.routers import auth, documents, questions
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -21,6 +23,7 @@ app = FastAPI(
 
 app.include_router(documents.router)
 app.include_router(questions.router)
+app.include_router(auth.router)
 
 @app.get("/health")
 async def health_check() -> dict[str, str]:

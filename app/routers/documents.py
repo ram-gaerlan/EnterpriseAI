@@ -16,6 +16,9 @@ from app.services.document_processor import (
     extract_text_from_txt,
 )
 
+from app.services.auth import get_current_user
+from app.models.db_models import User
+
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
@@ -26,6 +29,7 @@ router = APIRouter(prefix="/documents", tags=["documents"])
 async def upload_document(
     file: UploadFile,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> DocumentUploadResponse:
     extension = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
 
